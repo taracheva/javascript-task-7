@@ -23,7 +23,10 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
         }
         
         function runJob(currentJobIndex){
-            jobs[currentJobIndex]()
+            let errorTimeout = new Promise(resolve => {
+                setTimeout(resolve, timeout, new Error(`Promise timeout`));
+            });
+            Promise.race([jobs[currentJobIndex](), errorTimeout])
                 .then(result => processingResult(result, currentJobIndex))
                 .catch(result => processingResult(result, currentJobIndex));
             jobIndex++;
